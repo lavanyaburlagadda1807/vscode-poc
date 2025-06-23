@@ -42,8 +42,9 @@ import { DEFAULT_ICON } from '../../services/userDataProfile/common/userDataProf
 import { isString } from '../../../base/common/types.js';
 import { KeyCode } from '../../../base/common/keyCodes.js';
 import { ACTIVITY_BAR_BADGE_BACKGROUND, ACTIVITY_BAR_BADGE_FOREGROUND } from '../../common/theme.js';
-import { IBaseActionViewItemOptions } from '../../../base/browser/ui/actionbar/actionViewItems.js';
+import { IBaseActionViewItemOptions, ActionViewItem } from '../../../base/browser/ui/actionbar/actionViewItems.js';
 import { ICommandService } from '../../../platform/commands/common/commands.js';
+import { IDialogService } from '../../../platform/dialogs/common/dialogs.js';
 
 export class GlobalCompositeBar extends Disposable {
 
@@ -54,6 +55,7 @@ export class GlobalCompositeBar extends Disposable {
 
 	private readonly globalActivityAction = this._register(new Action(GLOBAL_ACTIVITY_ID));
 	private readonly accountAction = this._register(new Action(ACCOUNTS_ACTIVITY_ID));
+	private readonly alertAction = this._register(new Action('workbench.action.showAlert', 'Show Alert', ThemeIcon.asClassName(Codicon.bell), true, async () => this.dialogService.info('hi')));
 	private readonly globalActivityActionBar: ActionBar;
 
 	constructor(
@@ -64,6 +66,7 @@ export class GlobalCompositeBar extends Disposable {
 		@IInstantiationService private readonly instantiationService: IInstantiationService,
 		@IStorageService private readonly storageService: IStorageService,
 		@IExtensionService private readonly extensionService: IExtensionService,
+		@IDialogService private readonly dialogService: IDialogService,
 	) {
 		super();
 
@@ -89,10 +92,14 @@ export class GlobalCompositeBar extends Disposable {
 						contextMenuAlignmentOptions,
 						(actions: IAction[]) => {
 							actions.unshift(...[
-								toAction({ id: 'hideAccounts', label: localize('hideAccounts', "Hide Accounts"), run: () => setAccountsActionVisible(storageService, false) }),
+								toAction({ id: 'hideAccounts', label: localize('hideAccounts', "Hide Accounts"), run: () => setAccountsActionVisible(this.storageService, false) }),
 								new Separator()
 							]);
 						});
+				}
+
+				if (action.id === 'workbench.action.showAlert') {
+					return new ActionViewItem(undefined, action, { ...options, icon: true, label: false });
 				}
 
 				throw new Error(`No view item for action '${action.id}'`);
@@ -107,6 +114,7 @@ export class GlobalCompositeBar extends Disposable {
 		}
 
 		this.globalActivityActionBar.push(this.globalActivityAction);
+		this.globalActivityActionBar.push(this.alertAction);
 
 		this.registerListeners();
 	}
