@@ -55,7 +55,7 @@ export class GlobalCompositeBar extends Disposable {
 
 	private readonly globalActivityAction = this._register(new Action(GLOBAL_ACTIVITY_ID));
 	private readonly accountAction = this._register(new Action(ACCOUNTS_ACTIVITY_ID));
-	private readonly alertAction = this._register(new Action('workbench.action.showAlert', 'Show Alert', ThemeIcon.asClassName(Codicon.bell), true, async () => this.dialogService.info('hi')));
+	private readonly alertAction = this._register(new Action('workbench.action.showAlert', 'Show Alert', ThemeIcon.asClassName(Codicon.bell), true, async () => this.dialogService.info('Welcome to Our Online IDE – Build, Run, and Debug Code Right in Your Browser!')));
 	private readonly globalActivityActionBar: ActionBar;
 
 	constructor(
